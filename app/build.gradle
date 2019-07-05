@@ -1,0 +1,43 @@
+//标识是library库
+apply plugin: 'com.android.library'
+
+//获取git的提交次数，将提交次数作为versionCode
+static int gitVersionCode() {
+    def count = "git rev-list HEAD --count".execute().text.trim()
+    return count.isInteger() ? count.toInteger() : 0
+}
+
+//SDK info
+def SDK_NAME = "TestLibrary"
+def SDK_VERSION_NAME = "0.0.1"
+//sdk的保存路径
+def sdkDestinationPath = "build"
+//指定打包的源文件
+def zipFile = file('build/intermediates/bundles/release/classes.jar')
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode gitVersionCode()
+        versionName SDK_VERSION_NAME
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+}
+
+//上传aar到maven
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+//指定上传到maven的aar版本号
+version = SDK_VERSION_NAME
