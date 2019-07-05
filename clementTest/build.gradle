@@ -8,7 +8,8 @@ static int gitVersionCode() {
 }
 
 //library info
-def LIB_NAME = "TestLibrary"
+def LIB_GROUP = "com.clement.libraryTest"
+def LIB_NAME = "clementTest"
 def LIB_VERSION_NAME = "0.0.1"
 
 android {
@@ -39,14 +40,11 @@ apply plugin: 'com.jfrog.bintray'
 def siteUrl = 'https://github.com/Developmc/MavenLibraryTest'    // project homepage
 def gitUrl = 'https://github.com/Developmc/MavenLibraryTest.git' // project git
 
-////定义引用时的group
-//group = "com.clement.library"
-////maven仓库的Package name
-//artifactId = LIB_NAME
-////指定上传到maven的aar版本号
-//version = LIB_VERSION_NAME
-
-
+//定义引用时的group
+group = LIB_GROUP
+//版本号
+version = LIB_VERSION_NAME
+//上面配置后上传至JCenter后的编译路径是这样的： implementation 'group:artifactId:version'
 
 //传到jcenter至少需要四个文件，除了打包的aar之外，还需要pom和javadoc，source，否则是通不过jcenter的审核
 
@@ -83,14 +81,6 @@ install {
         pom {
             project {
                 packaging 'aar'
-                name LIB_NAME
-
-                groupId 'com.clement.library'    //定义引用时的group
-                artifactId LIB_NAME              //定义引用时的artifactId
-                version LIB_VERSION_NAME         //版本号
-
-                // 上面配置后上传至JCenter后的编译路径是这样的： implementation 'group:artifactId:version'
-
                 url siteUrl
                 // Set your license
                 licenses {
@@ -127,7 +117,7 @@ bintray {
 
         repo = "maven"               //跟创建的Maven仓库名字保持一致
         name = LIB_NAME                //发布到JCenter上的项目名字
-        desc = "Library fro test"      //项目描述
+        desc = "Library for test"      //项目描述
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
