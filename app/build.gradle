@@ -116,7 +116,7 @@ install {
     }
 }
 
-//配置bintray参数
+//配置bintray参数,bintrayUser和bintrayApiKey的值保存在local.properties内，可通过登录 https://bintray.com/developmc 获取
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 bintray {
