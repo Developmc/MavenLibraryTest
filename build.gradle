@@ -1,14 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    
+
     repositories {
         google()
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
-        
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -23,6 +22,8 @@ allprojects {
     repositories {
         google()
         jcenter()
+        //如果还没有将库子同步到JCenter中央库，需要指定作者的maven地址
+        maven { url 'https://dl.bintray.com/developmc/maven' }
     }
 }
 

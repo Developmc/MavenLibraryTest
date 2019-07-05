@@ -7,13 +7,9 @@ static int gitVersionCode() {
     return count.isInteger() ? count.toInteger() : 0
 }
 
-//SDK info
-def SDK_NAME = "TestLibrary"
-def SDK_VERSION_NAME = "0.0.1"
-//sdk的保存路径
-def sdkDestinationPath = "build"
-//指定打包的源文件
-def zipFile = file('build/intermediates/bundles/release/classes.jar')
+//library info
+def LIB_NAME = "TestLibrary"
+def LIB_VERSION_NAME = "0.0.1"
 
 android {
     compileSdkVersion 29
@@ -21,7 +17,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 29
         versionCode gitVersionCode()
-        versionName SDK_VERSION_NAME
+        versionName LIB_VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -39,5 +35,102 @@ dependencies {
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-//指定上传到maven的aar版本号
-version = SDK_VERSION_NAME
+//项目源码的github地址
+def siteUrl = 'https://github.com/Developmc/MavenLibraryTest'    // project homepage
+def gitUrl = 'https://github.com/Developmc/MavenLibraryTest.git' // project git
+
+////定义引用时的group
+//group = "com.clement.library"
+////maven仓库的Package name
+//artifactId = LIB_NAME
+////指定上传到maven的aar版本号
+//version = LIB_VERSION_NAME
+
+
+
+//传到jcenter至少需要四个文件，除了打包的aar之外，还需要pom和javadoc，source，否则是通不过jcenter的审核
+
+//打包sourcesJar
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+//打包javadoc
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+//解决 JavaDoc 中文注释生成失败的问题
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+//定义pom并打包aar
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                name LIB_NAME
+
+                groupId 'com.clement.library'    //定义引用时的group
+                artifactId LIB_NAME              //定义引用时的artifactId
+                version LIB_VERSION_NAME         //版本号
+
+                // 上面配置后上传至JCenter后的编译路径是这样的： implementation 'group:artifactId:version'
+
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer { //填写的一些基本信息
+                        id 'developmc'
+                        name 'Clement.wu'
+                        email '8392569@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+//配置bintray参数
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintrayUser")
+    key = properties.getProperty("bintrayApiKey")
+    configurations = ['archives']
+    pkg {
+
+        repo = "maven"               //跟创建的Maven仓库名字保持一致
+        name = LIB_NAME                //发布到JCenter上的项目名字
+        desc = "Library fro test"      //项目描述
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
