@@ -36,6 +36,6 @@ dependencies {
 //    implementation project(path: ':app')
 
 //    implementation 'com.clement.library:app:0.0.1'
-    implementation 'com.clement.libraryTest:clementTest:0.0.1'
+    implementation 'com.clement.libraryTest:clementTest:0.0.6'
 
 }
